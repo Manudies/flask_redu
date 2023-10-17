@@ -1,7 +1,24 @@
 <nav class="navbar">
+    {% if actual_inicio == "http://127.0.0.1:5000/" %}
+    Inicio
+    |
+    {% else %}
     <a href="/">Inicio</a>
     |
-    <a href="/purchase">Nueva Inversión</a>
+    {% endif %}
+
+    {% if actual_compra == "http://127.0.0.1:5000/purchase" %}
+    Compra
     |
+    {% else %}
+    <a href="/purchase">Compra</a>
+    |
+    {% endif %}
+    {% if actual_estado == "http://127.0.0.1:5000/status" %}
+    Estado
+    |
+    {% else %}
     <a href="/status">Estado</a>
+    |
+    {% endif %}
 </nav>
