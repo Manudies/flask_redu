@@ -4,17 +4,14 @@ from . import app
 
 @app.route("/")
 def inicio():
-    ruta = "http://127.0.0.1:5000/"
-    return render_template('inicio.html', actual_inicio=ruta)
+    return render_template('inicio.html', active_route='inicio')
 
 
 @app.route("/purchase")
 def compra():
-    ruta = "http://127.0.0.1:5000/purchase"
-    return render_template('compra.html', actual_compra=ruta)
+    return render_template('compra.html', active_route='compra')
 
 
 @app.route("/status")
 def estado():
-    ruta = "http://127.0.0.1:5000/status"
-    return render_template('estado.html', actual_estado=ruta)
+    return render_template('estado.html', active_route='estado')

@@ -1,5 +1,5 @@
 <nav class="navbar">
-    {% if actual_inicio == "http://127.0.0.1:5000/" %}
+    {% if active_route == "inicio" %}
     Inicio
     |
     {% else %}
@@ -7,16 +7,19 @@
     |
     {% endif %}
 
-    {% if actual_compra == "http://127.0.0.1:5000/purchase" %}
+    {% if active_route == "compra" %}
     Compra
     |
     {% else %}
     <a href="/purchase">Compra</a>
     |
     {% endif %}
-    {% if actual_estado == "http://127.0.0.1:5000/status" %}
+    {% if active_route == "estado" %}
     Estado
     {% else %}
     <a href="/status">Estado</a>
     {% endif %}
+
+    <!-- <a {% if active_route=="inicio" %} href="/" {% endif %}>Inicio</a> -->
+
 </nav>
