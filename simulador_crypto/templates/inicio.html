@@ -4,6 +4,61 @@
 {{ super() }}: Inicio
 {% endblock head_title %}
 {% block contenido %}
+<table class="paper">
+    <tr>
+        <th class="titulo-tabla">Fecha</th>
+        <th class="titulo-tabla">Hora</th>
+        <th class="titulo-tabla">Moneda de venta</th>
+        <th class="titulo-tabla numero">Cantidad vendida</th>
+        <th class="titulo-tabla">Moneda de compra</th>
+        <th class="titulo-tabla">Cantidad comprada</th>
 
+
+    </tr>
+    {% if movs %}
+    {% for m in movs %}
+    <tr {% if m.has_errors %} class="error" {% endif %}>
+        <td>
+            {% if m.fecha %}
+            {{ m.fecha }}
+            {% else %}
+            ---
+            {% endif %}
+        </td>
+        <td>
+            {{m.hora}}
+        </td>
+        <td>
+            {{ m.moneda_from }}
+        </td>
+        <td class="numero">
+            {{m.cantidad_from}}
+        </td>
+        <td>
+            {{m.moneda_to}}
+        </td>
+        <td class="numero">
+            {{m.cantidad_to}}
+        </td>
+
+
+    </tr>
+    {% if m.has_errors %}
+    <tr>
+        <td></td>
+        <td colspan="3">
+            {% for error in m.errores %}
+            <p class="error">{{ error }}</p>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="4" class="lista-vacia">No hay movimientos disponibles</td>
+    </tr>
+    {% endif %}
+</table>
 
 {% endblock contenido %}
