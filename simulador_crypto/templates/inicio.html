@@ -18,14 +18,14 @@
     {% if movs %}
     {% for m in movs %}
     <tr {% if m.has_errors %} class="error" {% endif %}>
-        <td>
+        <td class="date">
             {% if m.fecha %}
             {{ m.fecha }}
             {% else %}
             ---
             {% endif %}
         </td>
-        <td>
+        <td class="date">
             {{m.hora}}
         </td>
         <td>
