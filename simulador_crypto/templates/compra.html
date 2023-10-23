@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block head_title%}
 {{ super() }}: Invertir
@@ -9,6 +9,37 @@
 {% endblock page_title %}
 
 {% block contenido %}
+<form action='/purchase'>
+    {{ form.crsf_token }}
 
+    <div class='campo-formulario'>
+        {{ form.moneda_from.label }}
+        {{ form.moneda_from() }}
+    </div>
+    <div class='campo-formulario'>
+        {{ form.cantidad_from.label }}
+        {{ form.cantidad_from() }}
+    </div>
+    <div class='campo-formulario'>
+        {{ form.moneda_to.label }}
+        {{ form.moneda_to() }}
+    </div>
+    <div class='campo-formulario'>
+        {{form.cantidad_to.label}}
+        {{form.cantidad_to()}}
+    </div>
+    <div class='campo-formulario'>
+        {{form.precio_unitario.label}}
+        {{form.precio_unitario()}}
+    </div>
+    <div class='campo-formulario'>
+        {{form.calcular}}
+
+    </div>
+    <div class='campo-formulario'>
+        {{form.validar()}}
+    </div>
+
+</form>
 
 {% endblock contenido %}
