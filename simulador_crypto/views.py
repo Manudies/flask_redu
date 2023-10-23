@@ -1,6 +1,7 @@
-from flask import render_template
-from . import app, RUTA
 from .models import DBManager
+from flask import render_template, request
+from . import app, RUTA
+from .forms import MovimientoForm
 
 
 @app.route("/")
@@ -16,7 +17,7 @@ def inicio():
         archivo = ValueError
         if archivo:
             print("No he conseguido el try por que no hay base de datos")
-            sql_crear = 'CREATE TABLE "movimientos" ("id" INTEGER NOT NULL UNIQUE,"fecha" TEXT NOT NULL,"hora" TEXT,"moneda_from" TEXT NOT NULL,"cantidad_from" NUMERIC NOT NULL,"moneda_to" TEXT NOT NULL,"cantidad_to" NUMERIC NOT NULL,PRIMARY KEY("id" AUTOINCREMENT))'
+            sql_crear = 'CREATE TABLE "movimientos" ("id"	INTEGER NOT NULL UNIQUE,"fecha"	TEXT NOT NULL,"hora" TEXT NOT NULL,"moneda_from" TEXT NOT NULL,"cantidad_from" NUMERIC NOT NULL,"moneda_to" TEXT NOT NULL,"precio_unitario"	INTEGER NOT NULL,"cantidad_to" NUMERIC NOT NULL, PRIMARY KEY("id" AUTOINCREMENT))'
             db.crearSQL(sql_crear)
             movimientos = db.consultaSQL(sql_leer)
             print("Base de datos creada")
@@ -25,7 +26,8 @@ def inicio():
 
 @app.route("/purchase")
 def compra():
-    return render_template('compra.html', active_route='compra')
+    formulario = MovimientoForm()
+    return render_template('compra.html', form=formulario, active_route='compra')
 
 
 @app.route("/status")
