@@ -1,5 +1,6 @@
 from .models import DBManager
-from flask import render_template, request
+from flask import render_template
+import requests
 from . import app, RUTA
 from .forms import MovimientoForm
 
@@ -24,7 +25,7 @@ def inicio():
     return render_template('inicio.html', active_route='inicio', movs=movimientos)
 
 
-@app.route("/purchase")
+@app.route("/purchase", methods=['GET', 'POST'])
 def compra():
     formulario = MovimientoForm()
     return render_template('compra.html', form=formulario, active_route='compra')

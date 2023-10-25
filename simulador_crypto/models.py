@@ -63,5 +63,5 @@ class DBManager:
         # 3. Ejecutar la consulta
         cursor.execute(consulta)
 
-        # 5. Cerrar la conexión
+        # 4. Cerrar la conexión
         conexion.close()
