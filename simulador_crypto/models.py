@@ -17,6 +17,20 @@ class DBManager:
     def desconectar(self, conexion):
         conexion.close()
 
+    def crearSQL(self, consulta):
+
+        # 1. Conectar a la base de datos
+        conexion = sqlite3.connect(self.ruta)
+
+        # 2. Abrir cursor
+        cursor = conexion.cursor()
+
+        # 3. Ejecutar la consulta
+        cursor.execute(consulta)
+
+        # 4. Cerrar la conexión
+        conexion.close()
+
     def consultaSQL(self, consulta):
 
         # 1. Conectar a la base de datos
@@ -52,8 +66,7 @@ class DBManager:
         # 6. Devolver los resultados
         return self.registros
 
-    def crearSQL(self, consulta):
-
+    def crearEntrada(self, consulta):
         # 1. Conectar a la base de datos
         conexion = sqlite3.connect(self.ruta)
 
@@ -63,5 +76,8 @@ class DBManager:
         # 3. Ejecutar la consulta
         cursor.execute(consulta)
 
-        # 4. Cerrar la conexión
+        # 4. Ejecutar la consulta
+        conexion.commit()
+
+        # 5. Cerrar la conexión
         conexion.close()
