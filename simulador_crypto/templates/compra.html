@@ -11,7 +11,7 @@
 {% block contenido %}
 <form action='/purchase' method="post">
 
-    {{ form.crsf_token }}
+    {{form.csrf_token}}
 
     <div class='campo-formulario'>
         {{ form.moneda_from.label }}
@@ -28,19 +28,12 @@
     </div>
     <div class='campo-formulario'>
         {{ form.cantidad_to.label }}
-        {% if form.cantidad_to.data %}
-        {{form.cantidad_to.data }}
-        {% else %}
-        {% endif %}
+        {{ form.cantidad_to }}
 
     </div>
     <div class='campo-formulario'>
         {{ form.precio_unitario.label }}
-        {% if form.precio_unitario.data %}
-        {{form.precio_unitario.data}}
-        {% else %}
-        {% endif %}
-
+        {{ form.precio_unitario }}
 
     </div>
     <div class='campo-formulario'>
