@@ -35,19 +35,31 @@ def compra():
         formulario = MovimientoForm(data=request.form)
         if formulario.calcular.data:
             # Llamar a la API
-            formulario.precio_unitario.data = consultar_cambio(
+            rate = consultar_cambio(
                 formulario.moneda_from.data, formulario.moneda_to.data)
-            formulario.cantidad_to.data = float(
-                formulario.cantidad_from.data) * float(formulario.precio_unitario.data)
+            formulario.precio_unitario.process_data(rate)
+            q_to = float(formulario.precio_unitario.data) * \
+                float(formulario.cantidad_from.data)
+            formulario.cantidad_to.process_data(q_to)
+            # formulario.cantidad_to = formulario.cantidad_from.data*formulario.precio_unitario
+            # print(cantidad_to)
+            # print(rate)
             return render_template('compra.html', form=formulario, active_route='compra')
         else:
             # Guardo en la base de datos
             print('Guardar en la BD')
+            print(formulario.precio_unitario)
             db = DBManager(RUTA)
+            parametros = (
+                formulario.moneda_from.data,
+                float(formulario.cantidad_from.data),
+                formulario.moneda_to.data,
+                float(formulario.cantidad_to.data)
+            )
             # consulta = f'INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES ({datetime("now")}, {datetime("localtime")}, {formulario.moneda_from.data}, {formulario.cantidad_from.data}, {formulario.moneda_to.data}, {formulario.cantidad_to.data})'
-            consulta2 = "INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES (date('now'), time('now'), 'EUR', 50, 'EUR', 50)"
-            db.crearEntrada(consulta2)
-        return render_template('compra.html', form=formulario, active_route='compra')
+            consulta2 = "INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES (date('now'), time('now', 'localtime'),?,?,?,?)"
+            db.consultaConParametros(consulta2, parametros)
+            return render_template('compra.html', form=formulario, active_route='compra')
 
 
 @app.route("/status")

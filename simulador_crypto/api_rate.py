@@ -47,6 +47,3 @@ def consultar_inversion():
     else:
         print('Algo no ha ido bien. Error ',
               response.status_code, response.reason)
-
-
-# consultar_cambio('EUR', 'USD')
