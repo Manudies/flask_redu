@@ -12,7 +12,7 @@ class DBManager:
     def conectar(self):
         conexion = sqlite3.connect(self.ruta)
         cursor = conexion.cursor()
-        return conexion  # , cursor
+        return conexion, cursor
 
     def desconectar(self, conexion):
         conexion.close()
@@ -81,3 +81,18 @@ class DBManager:
 
         # 5. Cerrar la conexión
         conexion.close()
+
+    def consultaConParametros(self, consulta, params):
+        conexion, cursor = self.conectar()
+
+        resultado = False
+        try:
+            cursor.execute(consulta, params)
+            conexion.commit()
+            resultado = True
+        except Exception as ex:
+            print(ex)
+            conexion.rollback()
+
+        self.desconectar(conexion)
+        return resultado
