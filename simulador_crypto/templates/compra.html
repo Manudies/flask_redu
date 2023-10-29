@@ -9,7 +9,23 @@
 {% endblock page_title %}
 
 {% block contenido %}
-<form action='/purchase' method="post">
+
+{% if errors %}
+<div class="lista-errores">
+    <i class="fa-solid fa-xmark fa-lg" style="color: #f50505;"></i>
+    Revisa los errores
+    {% for error in errors %}
+    <p>Hay errores en el formulario:</p>
+    <ul>
+        {% for msg in error[1] %}
+        <li class="mensaje-error">{{ msg }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</div>
+{% endif %}
+
+<form action='/purchase' method="post" novalidate>
 
     {{form.csrf_token}}
 
@@ -26,15 +42,6 @@
         {{ form.moneda_to.label }}
         {{ form.moneda_to }}
     </div>
-    <div class='campo-formulario'>
-        {{ form.cantidad_to.label }}
-        {{ form.cantidad_to }}
-
-    </div>
-    <div class='campo-formulario'>
-        {{ form.precio_unitario.label }}
-        {{ form.precio_unitario }}
-
     </div>
     <div class='campo-formulario'>
         {{form.calcular}}
@@ -44,7 +51,22 @@
         {{form.validar()}}
     </div>
 
-
 </form>
+
+<div class='campo-formulario2'>
+    Cantidad de destino:
+    {% if data[1] %}
+    {{ data[1]}} {{ data[2] }}
+    {% else %}
+    {% endif %}
+
+</div>
+<div class='campo-formulario2'>
+    Precio unitario:
+    {% if data[0] %}
+    {{ data[0] }} {{data[3]}} / {{data[2]}}
+    {% else %}
+    {% endif %}
+</div>
 
 {% endblock contenido %}

@@ -30,36 +30,54 @@ def inicio():
 def compra():
     if request.method == 'GET':
         formulario = MovimientoForm()
-        return render_template('compra.html', form=formulario, active_route='compra')
+        rate = ""
+        qto = ""
+        return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra')
     if request.method == 'POST':
         formulario = MovimientoForm(data=request.form)
-        if formulario.calcular.data:
-            # Llamar a la API
-            if formulario.moneda_from.data == formulario.moneda_to.data:
-                print("ERROR")
-                return render_template('compra.html', form=formulario, active_route='compra')
+        if formulario.validate():
+            if formulario.calcular.data:
+                # Llamar a la API
+                if formulario.moneda_from.data == formulario.moneda_to.data:
+                    print("ERROR: Moneda de origen y destino no pueden ser iguales")
+                    rate = ""
+                    qto = ""
+                    return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra')
+                else:
+                    rate = consultar_cambio(
+                        formulario.moneda_from.data, formulario.moneda_to.data)
+                    qto = float(rate) * \
+                        float(formulario.cantidad_from.data)
+                    return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra')
             else:
+                # Guardo en la base de datos
                 rate = consultar_cambio(
                     formulario.moneda_from.data, formulario.moneda_to.data)
-                rate = round(rate, 10)
-                qto = float(rate) * \
-                    float(formulario.cantidad_from.data)
-                qto = round(qto, 10)
-                return render_template('compra.html', form=formulario, data=[rate, qto], active_route='compra')
+                qto = float(rate) * float(formulario.cantidad_from.data)
+                print('Guardar en la BD')
+                db = DBManager(RUTA)
+                parametros = (
+                    formulario.moneda_from.data,
+                    float(formulario.cantidad_from.data),
+                    formulario.moneda_to.data,
+                    round(qto, 10)
+                )
+                consulta2 = "INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES (date('now'), time('now', 'localtime'),?,?,?,?)"
+                resultado = db.consultaConParametros(consulta2, parametros)
+                if resultado:
+                    flash(
+                        "El moviento se ha guardado en tu monedero de Cryptos", category="exito")
+                    return redirect(url_for('inicio'))
+                return "No se ha podido realizar la transacción"
         else:
-            # Guardo en la base de datos
-            print('Guardar en la BD')
-            db = DBManager(RUTA)
-            parametros = (
-                formulario.moneda_from.data,
-                float(formulario.cantidad_from.data),
-                formulario.moneda_to.data,
-                float(formulario.cantidad_to.data)
-            )
-            # consulta = f'INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES ({datetime("now")}, {datetime("localtime")}, {formulario.moneda_from.data}, {formulario.cantidad_from.data}, {formulario.moneda_to.data}, {formulario.cantidad_to.data})'
-            consulta2 = "INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES (date('now'), time('now', 'localtime'),?,?,?,?)"
-            db.consultaConParametros(consulta2, parametros)
-            return render_template('compra.html', form=formulario, active_route='compra')
+            # TODO: pintar los mensajes de error junto al campo que lo provoca
+            print("voy por errores")
+            errores = []
+            for key in formulario.errors:
+                errores.append((key, formulario.errors[key]))
+                rate = ""
+                qto = ""
+            return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra', errors=errores)
 
 
 @app.route("/status")

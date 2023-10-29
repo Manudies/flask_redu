@@ -87,3 +87,51 @@ table.paper .titulo-tabla {
     margin-bottom: 8px;
     font-size: 1rem;
 }
+
+.campo-formulario2 {
+    display: inline-block;
+    margin: 15px;
+    padding: 10px;
+    font-size: 1rem;
+    min-width: auto;
+    border: solid 2px var(--neutral-0);
+    border-radius: 5px;
+}
+
+.error {
+    color: var(--error-color);
+}
+
+p.error {
+    font-size: medium;
+    margin: 0;
+    line-height: 0;
+}
+
+tr.error+tr td {
+    padding-bottom: 13px;
+}
+
+.lista-errores {
+    background-color: rgba(9, 15, 81, 0.3);
+    padding: 16px;
+    color: #600;
+    border-radius: 4px;
+}
+
+.mensaje-error {
+    color: #600;
+    font-weight: bold;
+    text-align: center;
+}
+
+.exito-flash {
+    font-size: 1rem;
+    background-color: rgba(0, 200, 0, .25);
+    padding: 2rem;
+    color: darkgreen;
+    font-weight: bold;
+    border-radius: 4px;
+    display: flex;
+    gap: 1rem;
+}
