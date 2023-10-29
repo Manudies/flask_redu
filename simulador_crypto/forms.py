@@ -16,8 +16,5 @@ class MovimientoForm(FlaskForm):
     moneda_to = SelectField('Moneda de destino', choices=[
         'EUR', 'BTC', 'ETH', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'DOGE', 'SHIB'])
 
-    precio_unitario = FloatField('Precio Unitario:')
-
-    cantidad_to = FloatField('Cantidad de destino:')
     calcular = SubmitField('Calcular')
     validar = SubmitField('Validar')
