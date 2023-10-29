@@ -8,16 +8,13 @@ class MovimientoForm(FlaskForm):
     fecha = HiddenField()
     hora = HiddenField()
     moneda_from = SelectField('Moneda de origen', choices=[
-                              'EUR', 'BTC', 'ETH', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'DOGE', 'SHIB'],
-                              validators=[DataRequired(message='No puede haber un movimiento sin cantidad')])
+                              'EUR', 'BTC', 'ETH', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'DOGE', 'SHIB'])
 
-    cantidad_from = FloatField('Cantidad de origen',
-                               validators=[DataRequired(message='No puede haber un movimiento sin cantidad'),
-                                           NumberRange(min=0.0000000001, message='no valido')])
+    cantidad_from = DecimalField('Cantidad de origen', validators=[
+                                 DataRequired(message='No puede haber un movimiento sin cantidad')])
 
     moneda_to = SelectField('Moneda de destino', choices=[
-        'EUR', 'BTC', 'ETH', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'DOGE', 'SHIB'],
-        validators=[DataRequired(message='Eso no es un cambio')])
+        'EUR', 'BTC', 'ETH', 'USDT', 'ADA', 'SOL', 'XRP', 'DOT', 'DOGE', 'SHIB'])
 
     precio_unitario = FloatField('Precio Unitario:')
 

@@ -35,20 +35,22 @@ def compra():
         formulario = MovimientoForm(data=request.form)
         if formulario.calcular.data:
             # Llamar a la API
-            rate = consultar_cambio(
-                formulario.moneda_from.data, formulario.moneda_to.data)
-            formulario.precio_unitario.process_data(rate)
-            q_to = float(formulario.precio_unitario.data) * \
-                float(formulario.cantidad_from.data)
-            formulario.cantidad_to.process_data(q_to)
-            # formulario.cantidad_to = formulario.cantidad_from.data*formulario.precio_unitario
-            # print(cantidad_to)
-            # print(rate)
-            return render_template('compra.html', form=formulario, active_route='compra')
+            if formulario.moneda_from.data == formulario.moneda_to.data:
+                print("ERROR")
+                return render_template('compra.html', form=formulario, active_route='compra')
+            else:
+                rate = consultar_cambio(
+                    formulario.moneda_from.data, formulario.moneda_to.data)
+                rate = round(rate, 10)
+                formulario.precio_unitario.process_data(rate)
+                print(formulario.precio_unitario)
+                q_to = float(formulario.precio_unitario.data) * \
+                    float(formulario.cantidad_from.data)
+                formulario.cantidad_to.process_data(q_to)
+                return render_template('compra.html', form=formulario, active_route='compra')
         else:
             # Guardo en la base de datos
             print('Guardar en la BD')
-            print(formulario.precio_unitario)
             db = DBManager(RUTA)
             parametros = (
                 formulario.moneda_from.data,
