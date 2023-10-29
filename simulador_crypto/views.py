@@ -42,12 +42,10 @@ def compra():
                 rate = consultar_cambio(
                     formulario.moneda_from.data, formulario.moneda_to.data)
                 rate = round(rate, 10)
-                formulario.precio_unitario.process_data(rate)
-                print(formulario.precio_unitario)
-                q_to = float(formulario.precio_unitario.data) * \
+                qto = float(rate) * \
                     float(formulario.cantidad_from.data)
-                formulario.cantidad_to.process_data(q_to)
-                return render_template('compra.html', form=formulario, active_route='compra')
+                qto = round(qto, 10)
+                return render_template('compra.html', form=formulario, data=[rate, qto], active_route='compra')
         else:
             # Guardo en la base de datos
             print('Guardar en la BD')
