@@ -36,18 +36,25 @@ def compra():
     if request.method == 'POST':
         formulario = MovimientoForm(data=request.form)
         if formulario.validate():
-            # formulario.moneda_from != "EUR":
-            db = DBManager(RUTA)
-            consulta = "SELECT moneda_to, cantidad_to FROM movimientos WHERE moneda_to == ?"
-            parametro = (formulario.moneda_from.data,)
-            hay_crytos = db.consultaCrypto(consulta, parametro)
-            print(hay_crytos)
-            # hay_crytos.key
+            if formulario.moneda_from != "EUR":
+                # Compruebo si tengo esa cripto moneda en el monedero y si la tengo obtengo el total
+                db = DBManager(RUTA)
+                consulta = "SELECT sum(cantidad_to) FROM movimientos WHERE moneda_to == ?"
+                parametro = (formulario.moneda_from.data,)
+                hay_cryptos = db.consultaCrypto(consulta, parametro)
+                print(hay_cryptos)
+                for i in hay_cryptos:
+                    dic = i
+                    valor = dic["sum(cantidad_to)"]
+                if valor <= formulario.cantidad_from.data:
+                    print('No tienes suficientes monedas')
+                else:
+                    print("Puedes realizar la operacion")
             if formulario.calcular.data:
                 db = DBManager(RUTA)
                 consulta = 'SELECT moneda_to FROM movimientos'
-                hay_crytos = db.consultaSQL(consulta)
-                if hay_crytos:
+                hay_cryptos = db.consultaSQL(consulta)
+                if hay_cryptos:
                     rate = consultar_cambio(
                         formulario.moneda_from.data, formulario.moneda_to.data)
                     qto = float(rate) * \
