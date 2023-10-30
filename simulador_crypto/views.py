@@ -36,14 +36,18 @@ def compra():
     if request.method == 'POST':
         formulario = MovimientoForm(data=request.form)
         if formulario.validate():
+            # formulario.moneda_from != "EUR":
+            db = DBManager(RUTA)
+            consulta = "SELECT moneda_to, cantidad_to FROM movimientos WHERE moneda_to == ?"
+            parametro = (formulario.moneda_from.data,)
+            hay_crytos = db.consultaCrypto(consulta, parametro)
+            print(hay_crytos)
+            # hay_crytos.key
             if formulario.calcular.data:
-                # Llamar a la API
-                if formulario.moneda_from.data == formulario.moneda_to.data:
-                    print("ERROR: Moneda de origen y destino no pueden ser iguales")
-                    rate = ""
-                    qto = ""
-                    return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra')
-                else:
+                db = DBManager(RUTA)
+                consulta = 'SELECT moneda_to FROM movimientos'
+                hay_crytos = db.consultaSQL(consulta)
+                if hay_crytos:
                     rate = consultar_cambio(
                         formulario.moneda_from.data, formulario.moneda_to.data)
                     qto = float(rate) * \
@@ -53,7 +57,8 @@ def compra():
                 # Guardo en la base de datos
                 rate = consultar_cambio(
                     formulario.moneda_from.data, formulario.moneda_to.data)
-                qto = float(rate) * float(formulario.cantidad_from.data)
+                qto = float(rate) * \
+                    float(formulario.cantidad_from.data)
                 print('Guardar en la BD')
                 db = DBManager(RUTA)
                 parametros = (
@@ -62,15 +67,15 @@ def compra():
                     formulario.moneda_to.data,
                     round(qto, 10)
                 )
-                consulta2 = "INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES (date('now'), time('now', 'localtime'),?,?,?,?)"
-                resultado = db.consultaConParametros(consulta2, parametros)
+                consulta = "INSERT INTO movimientos (fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to) VALUES (date('now'), time('now', 'localtime'),?,?,?,?)"
+                resultado = db.consultaConParametros(
+                    consulta, parametros)
                 if resultado:
                     flash(
                         "El moviento se ha guardado en tu monedero de Cryptos", category="exito")
                     return redirect(url_for('inicio'))
                 return "No se ha podido realizar la transacción"
         else:
-            # TODO: pintar los mensajes de error junto al campo que lo provoca
             print("voy por errores")
             errores = []
             for key in formulario.errors:
