@@ -66,7 +66,7 @@ class DBManager:
         # 6. Devolver los resultados
         return self.registros
 
-    def crearEntrada(self, consulta):
+    def consultaCrypto(self, consulta, params):
         # 1. Conectar a la base de datos
         conexion = sqlite3.connect(self.ruta)
 
@@ -74,13 +74,31 @@ class DBManager:
         cursor = conexion.cursor()
 
         # 3. Ejecutar la consulta
-        cursor.execute(consulta)
+        cursor.execute(consulta, params)
 
-        # 4. Ejecutar la consulta
-        conexion.commit()
+        # 4. Tratar los datos
+        # 4.1 Obtener los datos
+        datos = cursor.fetchall()
+
+        # 4.2 Los guardo localmente
+        self.registros = []
+        nombres_columna = []
+        for columna in cursor.description:
+            nombres_columna.append(columna[0])
+
+        for dato in datos:
+            movimiento = {}
+            indice = 0
+            for nombre in nombres_columna:
+                movimiento[nombre] = dato[indice]
+                indice += 1
+            self.registros.append(movimiento)
 
         # 5. Cerrar la conexión
         conexion.close()
+
+        # 6. Devolver los resultados
+        return self.registros
 
     def consultaConParametros(self, consulta, params):
         conexion, cursor = self.conectar()
