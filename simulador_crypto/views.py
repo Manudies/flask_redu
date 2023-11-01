@@ -1,4 +1,4 @@
-from .api_rate import consultar_cambio
+from .api_rate import consultar_cambio, consultar_inversion
 import datetime
 from .models import DBManager
 from flask import flash, redirect, render_template, request, url_for
@@ -103,5 +103,30 @@ def estado():
     eur_recup = db.consultaSQL(consulta2)
     saldo_euros_inver = (eur_recup[0]["IFNULL(sum(cantidad_to), 0)"]) - \
         (eur_inver[0]["IFNULL(sum(cantidad_from), 0)"])
+    # Obtengo la suma de cada cripto comprada en dos listas
+    consulta3 = "SELECT IFNULL(sum(cantidad_from), 0) FROM movimientos WHERE moneda_from == ?"
+    consulta4 = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == ?"
+    parametros = [('ADA',), ('BTC',), ('DOGE',), ('DOT',),
+                  ('ETH',), ('SHIB',), ('SOL',), ('USDT',), ('XRP',)]
+    venta_crypto = []
+    compra_crypto = []
+    m = 0
+    for i in parametros:
+        crypto_ven = db.consultaCrypto(consulta3, parametros[m])
+        crypto_com = db.consultaCrypto(consulta4, parametros[m])
+        venta_crypto.append(crypto_ven)
+        compra_crypto.append(crypto_com)
+        m += 1
+    venta_crypto_data = []
+    compra_crypto_data = []
+    for i in compra_crypto:
+        venta_crypto_data.append(i[0]["IFNULL(sum(cantidad_to), 0)"])
+    for i in venta_crypto:
+        compra_crypto_data.append(i[0]["IFNULL(sum(cantidad_from), 0)"])
+    print(compra_crypto_data)
+    print(venta_crypto_data)
+    # Llamo a la API y consulto el valor de cambio de cada moneda y lo guardo en una lista
+    cambio_monedas = consultar_inversion()
+    print(cambio_monedas)
 
     return render_template('estado.html', active_route='estado')
