@@ -8,10 +8,10 @@ class MovimientoForm(FlaskForm):
     monedas = ('EUR', 'ADA', 'BTC', 'DOGE', 'DOT', 'ETH',
                'SHIB', 'SOL', 'USDT', 'XRP')
 
-    def not_equal_to(self, campo):
-        self.campo = campo
-        if self.campo == self.data:
-            raise ValidationError("Las monedas no pueden ser iguales")
+    # def not_equal_to(self, campo):
+    #     self.campo = campo
+    #     if self.campo == self.data:
+    #         raise ValidationError("Las monedas no pueden ser iguales")
 
     id = HiddenField()
     fecha = HiddenField()
@@ -25,7 +25,7 @@ class MovimientoForm(FlaskForm):
 
     moneda_to = SelectField('Moneda de destino', choices=monedas,
                             validators=[DataRequired(message='No puede haber un movimiento sin cantidad'),
-                                        NotEqualTo("moneda_from", message="Las monedas no pueden ser iguales")])
+                                        NotEqualTo(f"moneda_from", message="Las monedas no pueden ser iguales.")])
 
     calcular = SubmitField('Calcular')
     validar = SubmitField('Validar')

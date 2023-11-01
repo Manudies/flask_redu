@@ -15,7 +15,6 @@
     <i class="fa-solid fa-xmark fa-lg" style="color: #f50505;"></i>
     Revisa los errores
     {% for error in errors %}
-    <p>Hay errores en el formulario:</p>
     <ul>
         {% for msg in error[1] %}
         <li class="mensaje-error">{{ msg }}</li>

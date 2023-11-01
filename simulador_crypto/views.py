@@ -19,7 +19,7 @@ def inicio():
         archivo = ValueError
         if archivo:
             print("No he conseguido el try por que no hay base de datos")
-            sql_crear = 'CREATE TABLE "movimientos" ("id"	INTEGER NOT NULL UNIQUE,"fecha"	TEXT NOT NULL,"hora" TEXT NOT NULL,"moneda_from" TEXT NOT NULL,"cantidad_from" NUMERIC NOT NULL,"moneda_to" TEXT NOT NULL,"cantidad_to" NUMERIC NOT NULL, PRIMARY KEY("id" AUTOINCREMENT))'
+            sql_crear = 'CREATE TABLE "movimientos" ("id"	INTEGER NOT NULL UNIQUE,"fecha"	TEXT NOT NULL,"hora" TEXT NOT NULL,"moneda_from" TEXT NOT NULL,"cantidad_from" NUMERIC NOT NULL,"moneda_to" TEXT NOT NULL,"cantidad_to" NUMERIC NOT NULL DEFAULT 0, PRIMARY KEY("id" AUTOINCREMENT))'
             db.crearSQL(sql_crear)
             movimientos = db.consultaSQL(sql_leer)
             print("Base de datos creada")
@@ -39,29 +39,31 @@ def compra():
             if formulario.moneda_from != "EUR":
                 # Compruebo si tengo esa cripto moneda en el monedero y si la tengo obtengo el total
                 db = DBManager(RUTA)
-                consulta = "SELECT sum(cantidad_to) FROM movimientos WHERE moneda_to == ?"
-                parametro = (formulario.moneda_from.data,)
-                hay_cryptos = db.consultaCrypto(consulta, parametro)
-                print(hay_cryptos)
-                for i in hay_cryptos:
-                    dic = i
-                    valor = dic["sum(cantidad_to)"]
-                if valor <= formulario.cantidad_from.data:
-                    print('No tienes suficientes monedas')
-                else:
-                    print("Puedes realizar la operacion")
+                consulta = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == ?"
+                moneda = (formulario.moneda_from.data,)
+                hay_cryptos = db.consultaCrypto(consulta, moneda)
+                valor_moneda = hay_cryptos[0]["IFNULL(sum(cantidad_to), 0)"]
+                # Si no tengo moneda o no tengo suficiente devuelvo un error.
+                if valor_moneda <= formulario.cantidad_from.data or valor_moneda == 0:
+                    errores = []
+                    error = ('', [
+                             (f"No tienes suficientes monedas. Tienes: {valor_moneda} {formulario.moneda_from.data}'s")])
+                    errores.append(error)
+                    return render_template('compra.html', form=formulario, data=[formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra', errors=errores)
+            # Calculo el precio de cambio
             if formulario.calcular.data:
-                db = DBManager(RUTA)
-                consulta = 'SELECT moneda_to FROM movimientos'
-                hay_cryptos = db.consultaSQL(consulta)
-                if hay_cryptos:
-                    rate = consultar_cambio(
-                        formulario.moneda_from.data, formulario.moneda_to.data)
-                    qto = float(rate) * \
-                        float(formulario.cantidad_from.data)
-                    return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra')
+                # db = DBManager(RUTA)
+                # consulta = 'SELECT moneda_to FROM movimientos'
+                # hay_cryptos = db.consultaSQL(consulta)
+                # print(hay_cryptos)
+                # if hay_cryptos:
+                rate = consultar_cambio(
+                    formulario.moneda_from.data, formulario.moneda_to.data)
+                qto = float(rate) * \
+                    float(formulario.cantidad_from.data)
+                return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra')
             else:
-                # Guardo en la base de datos
+                # Pulsar boton validad. Guardo en la base de datos
                 rate = consultar_cambio(
                     formulario.moneda_from.data, formulario.moneda_to.data)
                 qto = float(rate) * \
@@ -81,7 +83,8 @@ def compra():
                     flash(
                         "El moviento se ha guardado en tu monedero de Cryptos", category="exito")
                     return redirect(url_for('inicio'))
-                return "No se ha podido realizar la transacción"
+                return "No se ha podido realizar la transacción. Intentelo en unos instantes"
+
         else:
             print("voy por errores")
             errores = []

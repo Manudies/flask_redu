@@ -117,6 +117,7 @@ tr.error+tr td {
     padding: 16px;
     color: #600;
     border-radius: 4px;
+    text-align: center;
 }
 
 .mensaje-error {
