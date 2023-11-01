@@ -18,6 +18,19 @@
     {% include 'components/navbar.html' %}
 
     <main>
+        {% with mensajes = get_flashed_messages() %}
+        {% if mensajes %}
+        <div class="exito-flash">
+            <p><i class="fa-solid fa-circle-check fa-2xl" style="color: #1dc347;"></i></p>
+
+            <div class="mensajes-flash">
+                {% for msg in mensajes %}
+                <p>{{ msg }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
 
         {% block page_title%}
         <h1>Movimientos</h1>

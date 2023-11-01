@@ -44,7 +44,6 @@ def compra():
                 moneda = (formulario.moneda_from.data,)
                 he_comprado_crypto = db.consultaCrypto(consulta, moneda)
                 he_vendido_crypto = db.consultaCrypto(consulta2, moneda)
-                print(he_vendido_crypto[0]["IFNULL(sum(cantidad_from), 0)"])
                 valor_moneda = (he_comprado_crypto[0]["IFNULL(sum(cantidad_to), 0)"] -
                                 he_vendido_crypto[0]["IFNULL(sum(cantidad_from), 0)"])
                 # Si no tengo moneda o no tengo suficiente devuelvo un error.
@@ -56,18 +55,13 @@ def compra():
                     return render_template('compra.html', form=formulario, data=[formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra', errors=errores)
             # Calculo el precio de cambio
             if formulario.calcular.data:
-                # db = DBManager(RUTA)
-                # consulta = 'SELECT moneda_to FROM movimientos'
-                # hay_cryptos = db.consultaSQL(consulta)
-                # print(hay_cryptos)
-                # if hay_cryptos:
                 rate = consultar_cambio(
                     formulario.moneda_from.data, formulario.moneda_to.data)
                 qto = float(rate) * \
                     float(formulario.cantidad_from.data)
                 return render_template('compra.html', form=formulario, data=[rate, qto, formulario.moneda_to.data, formulario.moneda_from.data], active_route='compra')
+                # Si no es calcular es Validar . Guardo en la base de datos
             else:
-                # Pulsar boton validad. Guardo en la base de datos
                 rate = consultar_cambio(
                     formulario.moneda_from.data, formulario.moneda_to.data)
                 qto = float(rate) * \
