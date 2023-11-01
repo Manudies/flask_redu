@@ -95,4 +95,13 @@ def compra():
 
 @app.route("/status")
 def estado():
+    # Obtenemos el total de euros invertidos y recuperados.
+    db = DBManager(RUTA)
+    consulta = "SELECT IFNULL(sum(cantidad_from), 0) FROM movimientos WHERE moneda_from == 'EUR'"
+    consulta2 = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == 'EUR'"
+    eur_inver = db.consultaSQL(consulta)
+    eur_recup = db.consultaSQL(consulta2)
+    saldo_euros_inver = (eur_recup[0]["IFNULL(sum(cantidad_to), 0)"]) - \
+        (eur_inver[0]["IFNULL(sum(cantidad_from), 0)"])
+
     return render_template('estado.html', active_route='estado')

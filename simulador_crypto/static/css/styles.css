@@ -113,7 +113,9 @@ tr.error+tr td {
 }
 
 .lista-errores {
-    background-color: rgba(9, 15, 81, 0.3);
+    margin: 0 auto;
+    max-width: 630px;
+    background-color: rgba(222, 80, 80, 0.3);
     padding: 16px;
     color: #600;
     border-radius: 4px;
