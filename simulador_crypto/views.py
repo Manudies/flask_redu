@@ -36,13 +36,17 @@ def compra():
     if request.method == 'POST':
         formulario = MovimientoForm(data=request.form)
         if formulario.validate():
-            if formulario.moneda_from != "EUR":
+            if formulario.moneda_from.data != "EUR":
                 # Compruebo si tengo esa cripto moneda en el monedero y si la tengo obtengo el total
                 db = DBManager(RUTA)
                 consulta = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == ?"
+                consulta2 = "SELECT IFNULL(sum(cantidad_from), 0) FROM movimientos WHERE moneda_from == ?"
                 moneda = (formulario.moneda_from.data,)
-                hay_cryptos = db.consultaCrypto(consulta, moneda)
-                valor_moneda = hay_cryptos[0]["IFNULL(sum(cantidad_to), 0)"]
+                he_comprado_crypto = db.consultaCrypto(consulta, moneda)
+                he_vendido_crypto = db.consultaCrypto(consulta2, moneda)
+                print(he_vendido_crypto[0]["IFNULL(sum(cantidad_from), 0)"])
+                valor_moneda = (he_comprado_crypto[0]["IFNULL(sum(cantidad_to), 0)"] -
+                                he_vendido_crypto[0]["IFNULL(sum(cantidad_from), 0)"])
                 # Si no tengo moneda o no tengo suficiente devuelvo un error.
                 if valor_moneda <= formulario.cantidad_from.data or valor_moneda == 0:
                     errores = []
