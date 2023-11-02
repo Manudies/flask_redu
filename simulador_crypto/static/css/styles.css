@@ -138,3 +138,13 @@ tr.error+tr td {
     display: flex;
     gap: 1rem;
 }
+
+.inversion {
+    margin: 15px auto;
+    padding: 10px;
+    font-size: 1rem;
+    max-width: 400px;
+    min-width: 200px;
+    border: solid 2px var(--neutral-0);
+    border-radius: 5px;
+}

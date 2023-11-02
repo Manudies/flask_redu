@@ -101,8 +101,11 @@ def estado():
     consulta2 = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == 'EUR'"
     eur_inver = db.consultaSQL(consulta)
     eur_recup = db.consultaSQL(consulta2)
+
+    total_eur_inver = eur_inver[0]["IFNULL(sum(cantidad_from), 0)"]
     saldo_euros_inver = (eur_recup[0]["IFNULL(sum(cantidad_to), 0)"]) - \
         (eur_inver[0]["IFNULL(sum(cantidad_from), 0)"])
+
     # Obtengo la suma de cada cripto comprada en dos listas
     consulta3 = "SELECT IFNULL(sum(cantidad_from), 0) FROM movimientos WHERE moneda_from == ?"
     consulta4 = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == ?"
@@ -117,16 +120,30 @@ def estado():
         venta_crypto.append(crypto_ven)
         compra_crypto.append(crypto_com)
         m += 1
+    # Agrego a una lista los valores ordenados
     venta_crypto_data = []
     compra_crypto_data = []
     for i in compra_crypto:
         venta_crypto_data.append(i[0]["IFNULL(sum(cantidad_to), 0)"])
     for i in venta_crypto:
         compra_crypto_data.append(i[0]["IFNULL(sum(cantidad_from), 0)"])
-    print(compra_crypto_data)
-    print(venta_crypto_data)
+
+    # Resto las monedas compradas y vendidas
+    resta_crypto = list(
+        map(lambda x, y: x-y, venta_crypto_data, compra_crypto_data))
+
     # Llamo a la API y consulto el valor de cambio de cada moneda y lo guardo en una lista
     cambio_monedas = consultar_inversion()
-    print(cambio_monedas)
 
-    return render_template('estado.html', active_route='estado')
+    # Divido las listas
+    multi_crypto = list(
+        map(lambda x, y: x/y, resta_crypto, cambio_monedas))
+
+    valor_euros_cryptos = sum(multi_crypto)
+
+    valor_actual = total_eur_inver + saldo_euros_inver + valor_euros_cryptos
+    ganancia = valor_actual-total_eur_inver
+    ganancia = '{:,}'.format(ganancia)
+    valor_actual = '{:,}'.format(valor_actual)
+
+    return render_template('estado.html', data=[total_eur_inver, valor_actual, ganancia], active_route='estado')

@@ -29,7 +29,7 @@ def consultar_cambio(origen, destino):
 
 # Consulta de monedas para estado de la inversión
 def consultar_inversion():
-    endpoint = '/v1/exchangerate/EUR?filter_asset_id=EUR;BTC;ETH;USDT;ADA;SOL;XRP;DOT;DOGE;SHIB'
+    endpoint = '/v1/exchangerate/EUR?filter_asset_id=BTC;ETH;USDT;ADA;SOL;XRP;DOT;DOGE;SHIB'
     url = server+endpoint
     payload = {}
     headers = {
