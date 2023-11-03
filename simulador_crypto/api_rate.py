@@ -27,7 +27,7 @@ def consultar_cambio(origen, destino):
               response.status_code, response.reason)
 
 
-# Consulta de monedas para estado de la inversión
+# Consulta de monedas para estado de la inversión. El endpoint debe estar actualizado con las monedasde la variable monedas en form.py
 def consultar_inversion():
     endpoint = '/v1/exchangerate/EUR?filter_asset_id=BTC;ETH;USDT;ADA;SOL;XRP;DOT;DOGE;SHIB'
     url = server+endpoint

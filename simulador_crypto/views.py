@@ -3,10 +3,9 @@ import locale
 from .models import DBManager
 from flask import flash, redirect, render_template, request, url_for
 from . import app, RUTA
-from .forms import MovimientoForm, monedas
+from .forms import MovimientoForm
 
 locale.setlocale(category=locale.LC_ALL, locale="es_ES")
-# locale.localeconv()
 
 
 @app.route("/")
@@ -14,18 +13,14 @@ def inicio():
     # Crear la base de datos y la tabla
     db = DBManager(RUTA)
     try:
-        print("Intento el try")
         sql_leer = 'SELECT id, fecha, hora, moneda_from, cantidad_from, moneda_to, cantidad_to FROM movimientos'
         movimientos = db.consultaSQL(sql_leer)
-        print("Lo he conseguido")
     except:
         archivo = ValueError
         if archivo:
-            print("No he conseguido el try por que no hay base de datos")
             sql_crear = 'CREATE TABLE "movimientos" ("id"	INTEGER NOT NULL UNIQUE,"fecha"	TEXT NOT NULL,"hora" TEXT NOT NULL,"moneda_from" TEXT NOT NULL,"cantidad_from" NUMERIC NOT NULL,"moneda_to" TEXT NOT NULL,"cantidad_to" NUMERIC NOT NULL DEFAULT 0, PRIMARY KEY("id" AUTOINCREMENT))'
             db.crearSQL(sql_crear)
             movimientos = db.consultaSQL(sql_leer)
-            print("Base de datos creada")
     return render_template('inicio.html', active_route='inicio', movs=movimientos)
 
 
@@ -69,7 +64,6 @@ def compra():
                     formulario.moneda_from.data, formulario.moneda_to.data)
                 qto = float(rate) * \
                     float(formulario.cantidad_from.data)
-                print('Guardar en la BD')
                 db = DBManager(RUTA)
                 parametros = (
                     formulario.moneda_from.data,
@@ -87,7 +81,6 @@ def compra():
                 return "No se ha podido realizar la transacción. Intentelo en unos instantes"
 
         else:
-            print("voy por errores")
             errores = []
             for key in formulario.errors:
                 errores.append((key, formulario.errors[key]))
@@ -103,15 +96,14 @@ def estado():
     consulta = "SELECT IFNULL(sum(cantidad_from), 0) as cantidad_from_EUR FROM movimientos WHERE moneda_from == 'EUR'"
     consulta2 = "SELECT IFNULL(sum(cantidad_to), 0) as cantidad_to_EUR FROM movimientos WHERE moneda_to == 'EUR'"
     eur_inver = db.consultaSQL(consulta)
-    # print(eur_inver[0]["cantidad_from_EUR"])
     eur_recup = db.consultaSQL(consulta2)
-    # print(eur_recup[0]["cantidad_to_EUR"])
 
     total_eur_inver = eur_inver[0]["cantidad_from_EUR"]
     saldo_euros_inver = (eur_recup[0]["cantidad_to_EUR"]) - \
         (eur_inver[0]["cantidad_from_EUR"])
 
-    # Obtengo la suma de cada cripto comprada en dos listas
+    # Obtengo la suma de cada cripto comprada o vendida en dos listas.
+    # Los parametros deben coincidir en número y cantidad con parámetro monedas de form.py. El EUR no se incluye
     consulta3 = "SELECT IFNULL(sum(cantidad_from), 0) as cantidad_from FROM movimientos WHERE moneda_from == ?"
     consulta4 = "SELECT IFNULL(sum(cantidad_to), 0) as cantidad_to FROM movimientos WHERE moneda_to == ?"
     parametros = [('ADA',), ('BTC',), ('DOGE',), ('DOT',),
