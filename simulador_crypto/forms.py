@@ -3,16 +3,12 @@ from wtforms import DecimalField, HiddenField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError
 from wtforms_validators import NotEqualTo
 
+# Se pueden añadir más monedas pero SIEMPRE en orden alfabético y EUR, siempre primero
+monedas = ('EUR', 'ADA', 'BTC', 'DOGE', 'DOT', 'ETH',
+           'SHIB', 'SOL', 'USDT', 'XRP')
+
 
 class MovimientoForm(FlaskForm):
-    monedas = ('EUR', 'ADA', 'BTC', 'DOGE', 'DOT', 'ETH',
-               'SHIB', 'SOL', 'USDT', 'XRP')
-
-    # def not_equal_to(self, campo):
-    #     self.campo = campo
-    #     if self.campo == self.data:
-    #         raise ValidationError("Las monedas no pueden ser iguales")
-
     id = HiddenField()
     fecha = HiddenField()
     hora = HiddenField()
