@@ -1,9 +1,12 @@
 from .api_rate import consultar_cambio, consultar_inversion
-import datetime
+import locale
 from .models import DBManager
 from flask import flash, redirect, render_template, request, url_for
 from . import app, RUTA
-from .forms import MovimientoForm
+from .forms import MovimientoForm, monedas
+
+locale.setlocale(category=locale.LC_ALL, locale="es_ES")
+# locale.localeconv()
 
 
 @app.route("/")
@@ -97,18 +100,20 @@ def compra():
 def estado():
     # Obtenemos el total de euros invertidos y recuperados.
     db = DBManager(RUTA)
-    consulta = "SELECT IFNULL(sum(cantidad_from), 0) FROM movimientos WHERE moneda_from == 'EUR'"
-    consulta2 = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == 'EUR'"
+    consulta = "SELECT IFNULL(sum(cantidad_from), 0) as cantidad_from_EUR FROM movimientos WHERE moneda_from == 'EUR'"
+    consulta2 = "SELECT IFNULL(sum(cantidad_to), 0) as cantidad_to_EUR FROM movimientos WHERE moneda_to == 'EUR'"
     eur_inver = db.consultaSQL(consulta)
+    # print(eur_inver[0]["cantidad_from_EUR"])
     eur_recup = db.consultaSQL(consulta2)
+    # print(eur_recup[0]["cantidad_to_EUR"])
 
-    total_eur_inver = eur_inver[0]["IFNULL(sum(cantidad_from), 0)"]
-    saldo_euros_inver = (eur_recup[0]["IFNULL(sum(cantidad_to), 0)"]) - \
-        (eur_inver[0]["IFNULL(sum(cantidad_from), 0)"])
+    total_eur_inver = eur_inver[0]["cantidad_from_EUR"]
+    saldo_euros_inver = (eur_recup[0]["cantidad_to_EUR"]) - \
+        (eur_inver[0]["cantidad_from_EUR"])
 
     # Obtengo la suma de cada cripto comprada en dos listas
-    consulta3 = "SELECT IFNULL(sum(cantidad_from), 0) FROM movimientos WHERE moneda_from == ?"
-    consulta4 = "SELECT IFNULL(sum(cantidad_to), 0) FROM movimientos WHERE moneda_to == ?"
+    consulta3 = "SELECT IFNULL(sum(cantidad_from), 0) as cantidad_from FROM movimientos WHERE moneda_from == ?"
+    consulta4 = "SELECT IFNULL(sum(cantidad_to), 0) as cantidad_to FROM movimientos WHERE moneda_to == ?"
     parametros = [('ADA',), ('BTC',), ('DOGE',), ('DOT',),
                   ('ETH',), ('SHIB',), ('SOL',), ('USDT',), ('XRP',)]
     venta_crypto = []
@@ -124,9 +129,9 @@ def estado():
     venta_crypto_data = []
     compra_crypto_data = []
     for i in compra_crypto:
-        venta_crypto_data.append(i[0]["IFNULL(sum(cantidad_to), 0)"])
+        venta_crypto_data.append(i[0]["cantidad_to"])
     for i in venta_crypto:
-        compra_crypto_data.append(i[0]["IFNULL(sum(cantidad_from), 0)"])
+        compra_crypto_data.append(i[0]["cantidad_from"])
 
     # Resto las monedas compradas y vendidas
     resta_crypto = list(
@@ -143,7 +148,9 @@ def estado():
 
     valor_actual = total_eur_inver + saldo_euros_inver + valor_euros_cryptos
     ganancia = valor_actual-total_eur_inver
-    ganancia = '{:,}'.format(ganancia)
-    valor_actual = '{:,}'.format(valor_actual)
+    ganancia = locale.currency(ganancia, symbol=True, grouping=True)
+    valor_actual = locale.currency(valor_actual, symbol=True, grouping=True)
+    total_eur_inver = locale.currency(
+        total_eur_inver, symbol=True, grouping=True)
 
     return render_template('estado.html', data=[total_eur_inver, valor_actual, ganancia], active_route='estado')
